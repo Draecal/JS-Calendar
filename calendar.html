@@ -1,0 +1,217 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aui/9.5.0/aui/aui-prototyping.js" integrity="sha512-DdZbd80ZvbNbK1ppJ4ohvde2/z/kVBDJIc6c7Uwo3NJla8E/l0zz+CdP/W+d3RgAlj2hwfJv/9Ca2bdJYDLcEw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aui/9.5.0/aui/aui-prototyping-darkmode.min.css" integrity="sha512-3Bdo8km9KptiYNAoK4AbGstWLaa1/8YJzbTEfg0zRYzGc9jTAXzZTjLSY70p4p+F0v7dI4BeXfAmKW9jglzk2g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aui/9.5.0/aui/aui-prototyping.min.css" integrity="sha512-bR4/YpNaIlZKBXdAmVZF3tSZvBX4POmS5JYnRfpOiwDdBoP39rorAYo8zO2JgFp5+Z0G2dZxQa2J2cwxt+lCjQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    .A{
+      background-color: aquamarine;
+      text-align: center;
+      padding: 0.5rem;
+      width: 90%;
+    }
+    .A:hover{
+      background-color:coral;
+    }
+    .B{
+      background-color: lightskyblue;
+      text-align: center;
+      padding: 0.5rem;
+      width: 90%;
+    }
+    .B:hover{
+      background-color:coral;
+    }
+    .WOM{
+      background-color: cadetblue;
+      text-align: center;
+      padding: 0.5rem;
+      width: 90%;
+    }
+    .WOM:hover{
+      background-color:coral;
+    }
+    .UL{
+      background-color: lightpink;
+      text-align: center;
+      padding: 0.5rem;
+      width: 90%;
+    }
+    .UL:hover{
+      background-color:coral;
+    }
+    #currentMonth{
+      font-size: xx-large;
+    }
+  </style>
+</head>
+
+<body class="aui-page-notification">
+  <div id="page">
+    <div class="aui-page-panel" style="padding: 2rem;">
+      <div class="aui-page-panel-inner">
+        <div class="">
+          <div class="" style="text-align: center; padding: 0.5rem;">
+            <button class="aui-button aui-button-primary" onclick="prem()"><< Prev</button> <span id="currentMonth"></span> <button class="aui-button aui-button-primary" onclick="nexm()">Next >></button>
+          </div>
+        </div>
+        <div class="">
+          <div id="calendar" class="table-responsive-2"></div>
+        </div>
+        <div class="">
+          <a id="replace-text-trigger" data-replace-text="Read less" class="aui-expander-trigger" aria-controls="expander-with-replace-text-content">History of changes</a>
+          <div id="expander-with-replace-text-content" class="aui-expander-content">
+            What happens when you add a shiny new browser to a stack of already-disagreeing citizens? You'll inevitably find some bugs. This is the story of how we found a rendering quirk and how the Atlassian frontend team found and refined the fix. The problem The Atlassian User Interface (AUI) library has just finished an IE10 sprint to get our library prepped and ready for the newest member of the browser family. While IE10 seems generally quite good, we found a couple of problems due to IE10 dropping conditional comments; plus some undesirable behaviours.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>    
+  <script>
+    const YEAR = 2022
+    const SHIFTS = [
+    ["SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A",
+     "SHIFT A","SHIFT A","SHIFT B","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","UL"],
+    ["SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A",
+     "SHIFT A","SHIFT A","SHIFT B","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT B","WOM","WOM"]]
+    const CHANGES = [{
+      "user":"Your Name",
+      "changeDate":"2022-12-21",
+      "by":"Another user",
+      "oldShift":"A",
+      "newShift":"B",
+      "for":"2022-12-26",
+      "reason":"Some meaningful reason over here"
+    }]
+
+    function createCalendar(elem, year, month) {
+
+      let mon = month - 1; // months in JS are 0..11, not 1..12
+      let d = new Date(year, mon);
+      const weekday = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      const months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+
+      let table = '<table class="aui"><tr>';
+
+      // spaces for the first row
+      // from Monday till the first day of the month
+      // * * * 1  2  3  4
+      for (let i = 0; i < getDay(d); i++) {
+        table += '<td></td>';
+      }
+
+      // <td> with actual dates
+      while (d.getMonth() == mon) {
+        table += `<td><button class="aui-label ${SHIFTS[mon][d.getDate() - 1]}" onclick="modifyThis('${mon}','${d.getDate() - 1}')">
+           ${weekday[d.getDay()]} <br> ${d.getDate()} <br> ${SHIFTS[mon][d.getDate() - 1]} </button></td>`;
+
+        if (getDay(d) % 7 == 6) { // sunday, last day of week - newline
+          table += '</tr><tr>';
+        }
+
+        d.setDate(d.getDate() + 1);
+      }
+
+      // add spaces after last days of month for the last row
+      // 29 30 31 * * * *
+      if (getDay(d) != 0) {
+        for (let i = getDay(d); i < 7; i++) {
+          table += '<td></td>';
+        }
+      }
+
+      // close the table
+      table += '</tr></table>';
+
+      elem.innerHTML = table;
+      document.getElementById("currentMonth").innerHTML = months[mon]
+    }
+
+    function getDay(date) { // get day number from 0 (monday) to 6 (sunday)
+      let day = date.getDay();
+      if (day == 0) day = 7; // make Sunday (0) the last day
+      return day - 1;
+    }
+
+    createCalendar(calendar, YEAR, 1);
+    let listOfChanges = '<ul>'
+    CHANGES.forEach(c => {
+      listOfChanges += `<li><strong>Date:</strong> ${c.for} <strong>From:</strong> ${c.oldShift} <strong>To:</strong> ${c.newShift} <strong>By:</strong> ${c.by} <strong>Reason:</strong> ${c.reason}</li>`
+    })
+    $("#expander-with-replace-text-content").html(listOfChanges + '</ul>')
+    
+    function prem(){
+      let currentMonth = document.getElementById("currentMonth").innerHTML
+      const months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+      let m = months.indexOf(currentMonth) + 1
+      m == 1 ? false : createCalendar(calendar,YEAR,m - 1)
+
+    }
+    function nexm(){
+      let currentMonth = document.getElementById("currentMonth").innerHTML
+      const months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+      let m = months.indexOf(currentMonth) + 1
+      m == 12 ? false : createCalendar(calendar,YEAR,m + 1)
+    }
+    function modifyThis(mon,day){
+      const fixedDay = parseInt(day) + 1
+      const modal = `
+      <section id="demo-dialog" class="aui-dialog2 aui-dialog2-small aui-layer" role="dialog" tabindex="-1" aria-labelledby="dialog-show-button--heading" hidden data-aui-remove-on-hide="true">
+        <header class="aui-dialog2-header">
+            <h1 class="aui-dialog2-header-main" id="dialog-show-button--heading">Editing...</h1>
+            <button class="aui-close-button" type="button" aria-label="close"></button>
+        </header>
+        <div class="aui-dialog2-content">
+            <p>Editing values for ${new Date(YEAR,mon,fixedDay).toLocaleDateString()}</p>
+            <p>Select new SHIFT value</p>
+            <form class="aui top-label">
+              <select id="select2-example2">
+                  <option value="DEMO A">A</option>
+                  <option value="DEMO B">B</option>
+                  <option value="DEMO C">C</option>
+              </select>
+              <div class="field-group">
+                <label for="textarea-id">Reason</label>
+                <textarea class="textarea" name="comment" id="textarea-id" placeholder="Your comment here..."></textarea>
+              </div>
+            </form>
+        </div>
+        <footer class="aui-dialog2-footer">
+            <div class="aui-dialog2-footer-actions">
+                <button id="dialog-submit-button" class="aui-button aui-button-primary">Send Changes</button>
+            </div>
+        </footer>
+      </section>`
+      AJS.dialog2(modal).show()
+      AJS.$("#select2-example2").auiSelect2();
+      $("#dialog-submit-button").click(function(){
+        CHANGES.push({
+          "user":"Your Name",
+          "changeDate":new Date().toISOString().split("T")[0],
+          "by":"Random user",
+          "oldShift":SHIFTS[mon][day],
+          "newShift":$("#select2-example2").val(),
+          "for":new Date(YEAR,mon,fixedDay).toISOString().split("T")[0],
+          "reason":"Some meaningful reason over here"
+        })
+        SHIFTS[mon][day] = $("#select2-example2").val()
+
+        let currentMonth = document.getElementById("currentMonth").innerHTML
+        const months = ["January","February","March","April","May","June","July","August","September","October","November","December"]
+        let m = months.indexOf(currentMonth)
+        
+        createCalendar(calendar,YEAR,m + 1)
+        let listOfChanges = '<ul>'
+        CHANGES.forEach(c => {
+          listOfChanges += `<li><strong>Date:</strong> ${c.for} <strong>From:</strong> ${c.oldShift} <strong>To:</strong> ${c.newShift} <strong>By:</strong> ${c.by} <strong>Reason:</strong> ${c.reason}</li>`
+        })
+        $("#expander-with-replace-text-content").html(listOfChanges + '</ul>')
+        AJS.dialog2("#demo-dialog").hide()
+      })
+    }
+  </script>
+</body>
+</html>
