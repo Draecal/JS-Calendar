@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="test"></div>
+    <script>
+        const SHIFTS = [
+    ["SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A",
+     "SHIFT A","SHIFT A","SHIFT B","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","UL"],
+    ["SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT A","WOM","WOM","SHIFT A",
+     "SHIFT A","SHIFT A","SHIFT B","SHIFT A","WOM","WOM","SHIFT A","SHIFT A","SHIFT A","SHIFT A","SHIFT B","WOM","WOM"]]
+        const WEEK = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]
+        const LEN1 = SHIFTS[0].length
+        const LEN2 = SHIFTS[1].length
+        let month1 = []
+        let newMonth1 = []
+
+        let JAN = new Date(2023,0)
+//SET DAYS OFF. 0 = SUNDAY
+        const OFF = [6,0]
+//WHILE THE SAME MONTH
+        while(JAN.getMonth() == 0){
+//LOOP THROUGH DAYS
+
+            if(JAN.getDay() == OFF[0] || JAN.getDay() == OFF[1]){
+                //IF DAY IS MEANT TO BE OFF
+                month1.push(`OFF (${WEEK[JAN.getDay()]})`)
+            } else {
+                //PRESERVE VACATION LEAVE
+                if (SHIFTS[0][JAN.getDate() - 1] !== "UL"){
+                    month1.push(`SHIFT B (${WEEK[JAN.getDay()]})`)
+                } else {
+                    //CHANGE TO DESIRED SHIFT IN A NEW ARRAY
+                    month1.push(`UL (${WEEK[JAN.getDay()]})`)
+                }
+            }
+            //ADD ONE DAY TO THE LOOP
+            JAN.setDate(JAN.getDate() + 1)
+        }
+
+     document.getElementById("test").innerHTML = 
+     `<div>Month 1: ${LEN1} Month 2: ${LEN2}</div>
+     <h4>Month 1</h4>
+     <div style="float:left; padding: 1rem">
+        <p>Current</p>
+        ${SHIFTS[0].join(" <br>")}
+    </div>
+     <div style="float:left; padding: 1rem">
+        <p>New</p>
+        ${month1.join(" <br>")}
+    </div>`
+    
+     function getDay(date) { // get day number from 0 (monday) to 6 (sunday)
+            let day = date.getDay();
+            if (day == 0) day = 7; // make Sunday (0) the last day
+            return day - 1;
+        }
+    </script>
+</body>
+</html>
